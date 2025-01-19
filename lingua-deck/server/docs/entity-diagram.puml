@@ -1,0 +1,84 @@
+@startuml Lingua Deck
+entity "users" {
+    * user_id : INT AUTO_INCREMENT [PK]
+    --
+    username : VARCHAR(50)
+    email : VARCHAR(255)
+    password_hash : VARCHAR(100)
+    preferred_language : VARCHAR(5)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "languages" {
+    * language_code : VARCHAR(5) [PK]
+    --
+    language_name : VARCHAR(255)
+}
+
+entity "flashcards" {
+    * card_id : INT AUTO_INCREMENT [PK]
+    --
+    user_id : INT [FK]
+    term : VARCHAR(100)
+    definition : TEXT
+    example_sentence : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "flashcard_translations" {
+    * translation_id : INT AUTO_INCREMENT [PK]
+    --
+    card_id : INT [FK]
+    language_code : VARCHAR(5) [FK]
+    translated_term : VARCHAR(100)
+    translated_definition : TEXT
+    translated_example_sentence : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "study_sessions" {
+    * session_id : INT AUTO_INCREMENT [PK]
+    --
+    user_id : INT [FK]
+    session_date : TIMESTAMP
+    total_cards : INT
+    total_correct : INT
+    total_incorrect : INT
+    notes : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "flashcard_reviews" {
+    * review_id : INT AUTO_INCREMENT [PK]
+    --
+    user_id : INT [FK]
+    card_id : INT [FK]
+    rating : INT
+    review_text : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity "flashcard_attempts" {
+    * attempt_id : INT AUTO_INCREMENT [PK]
+    --
+    user_id : INT [FK]
+    card_id : INT [FK]
+    attempt_status : ENUM('correct', 'incorrect')
+    attempt_time : TIMESTAMP
+}
+
+' Relationships
+users ||--o{ flashcards : "has"
+users ||--o{ study_sessions : "has"
+users ||--o{ flashcard_reviews : "gives"
+users ||--o{ flashcard_attempts : "has attempted"
+flashcards ||--o{ flashcard_translations : "has"
+flashcards ||--o{ flashcard_reviews : "is reviewed by"
+flashcards ||--o{ flashcard_attempts : "is attempted in"
+languages ||--o{ flashcard_translations : "supports"
+@enduml
