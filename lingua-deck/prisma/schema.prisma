@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id            Int      @id @default(autoincrement())
+  username           String   @unique @db.VarChar(50)
+  email              String   @unique @db.VarChar(255)
+  password           String   @db.VarChar(100)
+  preferred_language String   @db.VarChar(5)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  flashcards         Flashcard[]        @relation("UserFlashcards")
+  study_sessions     StudySession[]     @relation("UserSessions")
+  flashcard_reviews  FlashcardReview[]  @relation("UserReviews")
+  flashcard_attempts FlashcardAttempt[] @relation("UserAttempts")
+
+  @@map("users")
+}
+
+model Language {
+  language_code String @id @db.VarChar(5)
+  language_name String @db.VarChar(255)
+
+  flashcard_translations FlashcardTranslation[] @relation("LanguageTranslations")
+
+  @@map("languages")
+}
+
+model Flashcard {
+  card_id          Int      @id @default(autoincrement())
+  user_id          Int
+  term             String   @db.VarChar(100)
+  definition       String   @db.Text
+  example_sentence String   @db.Text
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  user                   User                   @relation("UserFlashcards", fields: [user_id], references: [user_id])
+  flashcard_translations FlashcardTranslation[] @relation("FlashcardTranslations")
+  flashcard_reviews      FlashcardReview[]      @relation("FlashcardReviews")
+  flashcard_attempts     FlashcardAttempt[]     @relation("FlashcardAttempts")
+
+  @@map("flashcards")
+}
+
+model FlashcardTranslation {
+  translation_id              Int      @id @default(autoincrement())
+  card_id                     Int
+  language_code               String   @db.VarChar(5)
+  translated_term             String   @db.VarChar(100)
+  translated_definition       String   @db.Text
+  translated_example_sentence String   @db.Text
+  created_at                  DateTime @default(now())
+  updated_at                  DateTime @updatedAt
+
+  flashcard Flashcard @relation("FlashcardTranslations", fields: [card_id], references: [card_id])
+  language  Language  @relation("LanguageTranslations", fields: [language_code], references: [language_code])
+
+  @@map("flashcard_translations")
+}
+
+model StudySession {
+  session_id      Int      @id @default(autoincrement())
+  user_id         Int
+  session_date    DateTime @default(now())
+  total_cards     Int
+  total_correct   Int
+  total_incorrect Int
+  notes           String?  @db.Text
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  user User @relation("UserSessions", fields: [user_id], references: [user_id])
+
+  @@map("study_sessions")
+}
+
+model FlashcardReview {
+  review_id   Int      @id @default(autoincrement())
+  user_id     Int
+  card_id     Int
+  rating      Int
+  review_text String?  @db.Text
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user      User      @relation("UserReviews", fields: [user_id], references: [user_id])
+  flashcard Flashcard @relation("FlashcardReviews", fields: [card_id], references: [card_id])
+
+  @@map("flashcard_reviews")
+}
+
+model FlashcardAttempt {
+  attempt_id     Int           @id @default(autoincrement())
+  user_id        Int
+  card_id        Int
+  attempt_status AttemptStatus
+  attempt_time   DateTime      @default(now())
+
+  user      User      @relation("UserAttempts", fields: [user_id], references: [user_id])
+  flashcard Flashcard @relation("FlashcardAttempts", fields: [card_id], references: [card_id])
+
+  @@map("flashcard_attempts")
+}
+
+enum AttemptStatus {
+  correct
+  incorrect
+}
