@@ -13,6 +13,7 @@ model User {
   email              String   @unique @db.VarChar(255)
   password           String   @db.VarChar(100)
   preferred_language String   @db.VarChar(5)
+  token              String?  @db.VarChar(100)
   created_at         DateTime @default(now())
   updated_at         DateTime @updatedAt
 
