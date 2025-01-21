@@ -26,4 +26,15 @@ const login = async (request, response, next) => {
   }
 };
 
-export default { register, login };
+const get = async (request, response, next) => {
+  try {
+    const result = await userService.get(request.user);
+    response.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { register, login, get };

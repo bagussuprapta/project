@@ -122,3 +122,29 @@ describe("POST /api/users/login", function () {
     expect(result.body.error.message).toBe("username is required");
   });
 });
+
+describe("GET /api/users/current", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should can get current user", async () => {
+    const result = await supertest(web).get("/api/users/current").set("Authorization", "test");
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("test");
+    expect(result.body.data.email).toBe("test@test.com");
+    expect(result.body.data.preferred_language).toBe("en");
+  });
+
+  it("should reject if token is invalid", async () => {
+    const result = await supertest(web).get("/api/users/current").set("Authorization", "wrong");
+
+    expect(result.status).toBe(401);
+    expect(result.body.error).toBeDefined();
+  });
+});
