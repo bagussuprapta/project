@@ -5,7 +5,9 @@ function formatErrorMessage(errorMessage) {
 }
 
 const validator = (schema, request) => {
-  const result = schema.validate(request);
+  const result = schema.validate(request, {
+    allowUnknown: false,
+  });
   if (result.error) {
     throw new ResponseError(400, formatErrorMessage(result.error.message));
   } else {
