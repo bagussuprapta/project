@@ -148,3 +148,137 @@ describe("GET /api/users/current", function () {
     expect(result.body.error).toBeDefined();
   });
 });
+
+describe("PATCH /api/users/current", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+
+  afterEach(async () => {
+    await removeTestUser();
+  });
+
+  it("should update user successfully when all input data is valid", async () => {
+    let result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      username: "testupdated",
+      email: "testupdated@test.com",
+      preferred_language: "fr",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("testupdated");
+    expect(result.body.data.email).toBe("testupdated@test.com");
+    expect(result.body.data.preferred_language).toBe("fr");
+
+    result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      username: "test",
+      email: "test@test.com",
+      preferred_language: "en",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("test");
+    expect(result.body.data.email).toBe("test@test.com");
+    expect(result.body.data.preferred_language).toBe("en");
+  });
+
+  it("should return unauthorized when authorization header is missing", async () => {
+    const result = await supertest(web).patch("/api/users/current").send({
+      username: "newtest",
+      email: "newtest@test.com",
+      preferred_language: "fr",
+    });
+
+    expect(result.status).toBe(401);
+    expect(result.body.error).toBeDefined();
+  });
+
+  it("should return unauthorized when authorization header is invalid", async () => {
+    const result = await supertest(web).patch("/api/users/current").set("Authorization", "wrong").send({
+      username: "newtest",
+      email: "newtest@test.com",
+      preferred_language: "fr",
+    });
+
+    expect(result.status).toBe(401);
+    expect(result.body.error).toBeDefined();
+  });
+
+  it("should can update username only", async () => {
+    let result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      username: "newtest",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("newtest");
+    expect(result.body.data.email).toBe("test@test.com");
+    expect(result.body.data.preferred_language).toBe("en");
+
+    result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      username: "test",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("test");
+    expect(result.body.data.email).toBe("test@test.com");
+    expect(result.body.data.preferred_language).toBe("en");
+  });
+
+  it("should can update email only", async () => {
+    let result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      email: "newtest@test.com",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("test");
+    expect(result.body.data.email).toBe("newtest@test.com");
+    expect(result.body.data.preferred_language).toBe("en");
+
+    result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      email: "test@test.com",
+    });
+
+    expect(result.status).toBe(200);
+    expect(result.body.data.username).toBe("test");
+    expect(result.body.data.email).toBe("test@test.com");
+    expect(result.body.data.preferred_language).toBe("en");
+  });
+
+  it("should return bad request when email is already registered", async () => {
+    let result = await supertest(web).post("/api/users").send({
+      username: "jhon",
+      email: "jhon@test.com",
+      password: "jhon123",
+      preferred_language: "en",
+    });
+
+    expect(result.status).toBe(201);
+    expect(result.body.data.username).toBe("jhon");
+
+    result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      email: "jhon@test.com",
+    });
+
+    expect(result.status).toBe(500);
+    await removeTestUser("jhon");
+  });
+
+  it("should return bad request when username is already registered", async () => {
+    let result = await supertest(web).post("/api/users").send({
+      username: "jhon",
+      email: "jhon@test.com",
+      password: "jhon123",
+      preferred_language: "en",
+    });
+
+    expect(result.status).toBe(201);
+    expect(result.body.data.username).toBe("jhon");
+
+    result = await supertest(web).patch("/api/users/current").set("Authorization", "test").send({
+      username: "jhon",
+    });
+
+    expect(result.status).toBe(500);
+    await removeTestUser("jhon");
+  });
+});

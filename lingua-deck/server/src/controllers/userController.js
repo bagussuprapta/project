@@ -37,4 +37,16 @@ const get = async (request, response, next) => {
   }
 };
 
-export default { register, login, get };
+const update = async (request, response, next) => {
+  try {
+    request.body.user_id = request.user.user_id;
+    const result = await userService.update(request.body);
+    response.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { register, login, get, update };

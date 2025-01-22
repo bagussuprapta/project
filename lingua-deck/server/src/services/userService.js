@@ -1,4 +1,4 @@
-import { getUserValidation, loginUserValidation, registerUserValidation } from "../validations/userValidation.js";
+import { getUserValidation, loginUserValidation, registerUserValidation, updateUserValidation } from "../validations/userValidation.js";
 import { validator } from "../validations/validator.js";
 import { prismaClient } from "../apps/database.js";
 import { ResponseError } from "../errors/responseError.js";
@@ -78,4 +78,39 @@ const get = async (request) => {
   return queriedUser;
 };
 
-export default { register, login, get };
+const update = async (request) => {
+  const validatedUpdateRequest = validator(updateUserValidation, request);
+  const countedUser = await prismaClient.user.count({
+    where: {
+      user_id: validatedUpdateRequest.user_id,
+    },
+  });
+  if (countedUser !== 1) {
+    throw new ResponseError(404, "user is not found");
+  }
+
+  const dataUpdate = {};
+  if (validatedUpdateRequest.username) {
+    dataUpdate.username = validatedUpdateRequest.username;
+  }
+  if (validatedUpdateRequest.email) {
+    dataUpdate.email = validatedUpdateRequest.email;
+  }
+  if (validatedUpdateRequest.preferred_language) {
+    dataUpdate.preferred_language = validatedUpdateRequest.preferred_language;
+  }
+
+  return await prismaClient.user.update({
+    where: {
+      user_id: validatedUpdateRequest.user_id,
+    },
+    data: dataUpdate,
+    select: {
+      username: true,
+      email: true,
+      preferred_language: true,
+    },
+  });
+};
+
+export default { register, login, get, update };
