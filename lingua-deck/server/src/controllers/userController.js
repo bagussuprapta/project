@@ -49,4 +49,17 @@ const update = async (request, response, next) => {
   }
 };
 
-export default { register, login, get, update };
+const logout = async (request, response, next) => {
+  try {
+    await userService.logout(request.user);
+    response.status(200).json({
+      data: {
+        message: "OK",
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { register, login, get, update, logout };

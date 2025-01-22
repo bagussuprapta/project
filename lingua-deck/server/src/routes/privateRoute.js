@@ -6,5 +6,6 @@ const privateRouter = new express.Router();
 privateRouter.use(authMiddleware);
 privateRouter.get("/api/users/current", userController.get);
 privateRouter.patch("/api/users/current", userController.update);
+privateRouter.delete("/api/users/logout", userController.logout);
 
 export { privateRouter };
