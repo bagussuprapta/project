@@ -17,6 +17,7 @@ const authMiddleware = async (request, response, next) => {
         token: token,
       },
       select: {
+        user_id: true,
         username: true,
       },
     });

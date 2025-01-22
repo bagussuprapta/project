@@ -13,6 +13,7 @@ const loginUserValidation = Joi.object({
 });
 
 const getUserValidation = Joi.object({
+  user_id: Joi.number(),
   username: Joi.string().min(3).max(50).required(),
 });
 
