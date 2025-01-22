@@ -259,7 +259,7 @@ describe("PATCH /api/users/current", function () {
       email: "jhon@test.com",
     });
 
-    expect(result.status).toBe(500);
+    expect(result.status).toBe(409);
     await removeTestUser("jhon");
   });
 
@@ -278,7 +278,7 @@ describe("PATCH /api/users/current", function () {
       username: "jhon",
     });
 
-    expect(result.status).toBe(500);
+    expect(result.status).toBe(409);
     await removeTestUser("jhon");
   });
 });

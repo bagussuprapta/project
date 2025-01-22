@@ -80,6 +80,7 @@ const get = async (request) => {
 
 const update = async (request) => {
   const validatedUpdateRequest = validator(updateUserValidation, request);
+
   const countedUser = await prismaClient.user.count({
     where: {
       user_id: validatedUpdateRequest.user_id,
@@ -87,6 +88,17 @@ const update = async (request) => {
   });
   if (countedUser !== 1) {
     throw new ResponseError(404, "user is not found");
+  }
+
+  const countTaken = await prismaClient.user.count({
+    where: {
+      OR: [{ username: validatedUpdateRequest.username }, { email: validatedUpdateRequest.email }],
+      NOT: { user_id: validatedUpdateRequest.user_id },
+    },
+  });
+
+  if (countTaken >= 1) {
+    throw new ResponseError(409, "username or email not available");
   }
 
   const dataUpdate = {};
