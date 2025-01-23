@@ -20,3 +20,18 @@ export const createTestUser = async () => {
     },
   });
 };
+
+export const removeTodayTestFlashcard = async (term = "test") => {
+  const today = new Date();
+  const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+  await prismaClient.flashcard.deleteMany({
+    where: {
+      created_at: {
+        gte: startOfDay,
+        lte: endOfDay,
+      },
+    },
+  });
+};

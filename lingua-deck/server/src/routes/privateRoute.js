@@ -1,5 +1,6 @@
 import express from "express";
 import userController from "../controllers/userController.js";
+import flashcardController from "../controllers/flashcardController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
 
 const privateRouter = new express.Router();
@@ -7,5 +8,7 @@ privateRouter.use(authMiddleware);
 privateRouter.get("/api/users/current", userController.get);
 privateRouter.patch("/api/users/current", userController.update);
 privateRouter.delete("/api/users/logout", userController.logout);
+
+privateRouter.post("/api/flashcards", flashcardController.create);
 
 export { privateRouter };
