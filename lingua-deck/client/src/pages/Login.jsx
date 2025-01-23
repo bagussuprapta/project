@@ -2,28 +2,30 @@ import { useContext, useEffect, useState } from "react";
 import Navbar from "../components/layout/Navbar";
 import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../context/authContext";
+import { UserContext } from "../context/userContext";
 
 export default function Login() {
-  const { isLoggedIn, setIsLoggedIn, login } = useContext(AuthContext);
+  const authProvider = useContext(AuthContext);
+  const userProvider = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (authProvider.isLoggedIn) {
       navigate("/profile");
     }
-  }, [isLoggedIn, navigate]);
+  }, [authProvider.isLoggedIn, navigate]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const result = await login(username, password);
+    const result = await userProvider.login(username, password);
     if (result?.error) {
       setMessage(result.error.message);
     } else {
       localStorage.setItem("token", result.data.token);
-      setIsLoggedIn(true);
+      authProvider.setIsLoggedIn(true);
     }
   };
   return (

@@ -1,9 +1,11 @@
 import { Link } from "react-router";
-import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
+import { AuthContext } from "../../context/authContext";
+import { UserContext } from "../../context/userContext";
 
 export default function Navbar() {
-  const { isLoggedIn, logout } = useContext(AuthContext);
+  const authProvider = useContext(AuthContext);
+  const userProvider = useContext(UserContext);
 
   return (
     <header className="fixed top-0 left-1 right-1 z-50">
@@ -21,14 +23,16 @@ export default function Navbar() {
           </li>
         </ol>
         <ol>
-          {isLoggedIn ? (
+          {authProvider.isLoggedIn ? (
             <li className="flex gap-x-4">
               <Link className="text-[#b6cde8] hover:text-white" to="/profile">
                 Profile
               </Link>
               <Link
                 onClick={() => {
-                  logout();
+                  userProvider.logout();
+                  authProvider.setIsLoggedIn(false);
+                  localStorage.clear("token");
                 }}
                 className="text-[#b6cde8] hover:text-white"
                 to="/"
