@@ -35,13 +35,16 @@ model Language {
 }
 
 model Flashcard {
-  card_id          Int      @id @default(autoincrement())
+  card_id          Int                   @id @default(autoincrement())
   user_id          Int
-  term             String   @db.VarChar(100)
-  definition       String   @db.Text
-  example_sentence String   @db.Text
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  term             String                @db.VarChar(100)
+  definition       String                @db.Text
+  level            FlashcardLevel
+  category         String                @db.VarChar(100)
+  part_of_speech   FlashcardPartOfSpeech
+  example_sentence String                @db.Text
+  created_at       DateTime              @default(now())
+  updated_at       DateTime              @updatedAt
 
   user                   User                   @relation("UserFlashcards", fields: [user_id], references: [user_id])
   flashcard_translations FlashcardTranslation[] @relation("FlashcardTranslations")
@@ -114,4 +117,18 @@ model FlashcardAttempt {
 enum AttemptStatus {
   correct
   incorrect
+}
+
+enum FlashcardLevel {
+  beginner
+  intermediate
+  advance
+}
+
+enum FlashcardPartOfSpeech {
+  noun
+  verb
+  adjective
+  adverb
+  preposition
 }
