@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router";
 import { AuthContext } from "../context/authContext";
 
 export default function Login() {
-  const { isLoggedIn, login } = useContext(AuthContext);
+  const { isLoggedIn, setIsLoggedIn, login } = useContext(AuthContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -23,6 +23,7 @@ export default function Login() {
       setMessage(result.error.message);
     } else {
       localStorage.setItem("token", result.data.token);
+      setIsLoggedIn(true);
     }
   };
   return (

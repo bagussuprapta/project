@@ -3,7 +3,7 @@ import { AuthContext } from "../../context/authContext";
 import { useContext } from "react";
 
 export default function Navbar() {
-  const { isLoggedIn } = useContext(AuthContext);
+  const { isLoggedIn, logout } = useContext(AuthContext);
 
   return (
     <header className="fixed top-0 left-1 right-1 z-50">
@@ -26,7 +26,13 @@ export default function Navbar() {
               <Link className="text-[#b6cde8] hover:text-white" to="/profile">
                 Profile
               </Link>
-              <Link className="text-[#b6cde8] hover:text-white" to="/">
+              <Link
+                onClick={() => {
+                  logout();
+                }}
+                className="text-[#b6cde8] hover:text-white"
+                to="/"
+              >
                 Logout
               </Link>
             </li>

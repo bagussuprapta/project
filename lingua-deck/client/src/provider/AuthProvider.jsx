@@ -6,15 +6,18 @@ export default function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    async function validateToken() {
-      setIsLoggedIn(await authAPI.isTokenValid());
-    }
-    validateToken();
-  }, []);
+    localStorage.getItem("token") && setIsLoggedIn(true);
+  }, [isLoggedIn]);
 
   async function login(username, password) {
     return await authAPI.login(username, password);
   }
 
-  return <AuthContext.Provider value={{ isLoggedIn, login }}>{children}</AuthContext.Provider>;
+  async function logout() {
+    await authAPI.logout();
+    setIsLoggedIn(false);
+    localStorage.clear("token");
+  }
+
+  return <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, logout }}>{children}</AuthContext.Provider>;
 }
