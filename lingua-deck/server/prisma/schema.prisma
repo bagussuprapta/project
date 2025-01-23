@@ -37,12 +37,12 @@ model Language {
 model Flashcard {
   card_id          Int                   @id @default(autoincrement())
   user_id          Int
-  term             String                @db.VarChar(100)
-  definition       String                @db.Text
+  term             String                @db.Text
+  definition       String                @db.VarChar(100)
   level            FlashcardLevel
   category         String                @db.VarChar(100)
   part_of_speech   FlashcardPartOfSpeech
-  example_sentence String                @db.Text
+  example_sentence String?               @db.Text
   created_at       DateTime              @default(now())
   updated_at       DateTime              @updatedAt
 
