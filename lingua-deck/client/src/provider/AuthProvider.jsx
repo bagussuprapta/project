@@ -12,5 +12,9 @@ export default function AuthProvider({ children }) {
     validateToken();
   }, []);
 
-  return <AuthContext.Provider value={{ isLoggedIn }}>{children}</AuthContext.Provider>;
+  async function login(username, password) {
+    return await authAPI.login(username, password);
+  }
+
+  return <AuthContext.Provider value={{ isLoggedIn, login }}>{children}</AuthContext.Provider>;
 }
