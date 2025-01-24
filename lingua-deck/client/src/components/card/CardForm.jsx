@@ -1,20 +1,36 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Field, Label, Radio, RadioGroup } from "@headlessui/react";
+import { FlashcardContext } from "../../context/flashcardContext";
 import Flashcard from "./Flashcard";
 
 const levelOption = ["beginner", "intermediate", "advance"];
 const partOfSpeechOption = ["noun", "verb", "adjective", "adverb", "preposition"];
 
 export default function CardForm({ setIsOpen }) {
+  const flashcardProvider = useContext(FlashcardContext);
   const [term, setTerm] = useState("");
   const [definition, setDefinition] = useState("");
   const [level, setLevel] = useState("");
   const [category, setCategory] = useState("");
   const [partOfSpeech, setPartOfSpeech] = useState("");
   const [exampleSentence, setExampleSentence] = useState("");
+  const [message, setMessage] = useState("");
 
   async function handleSubmit(event) {
     event.preventDefault();
+    const result = await flashcardProvider.create({
+      term,
+      definition,
+      level,
+      category,
+      part_of_speech: partOfSpeech,
+      example_sentence: exampleSentence,
+    });
+    if (result?.error) {
+      setMessage(result.error.message);
+    } else {
+      setIsOpen(false);
+    }
   }
 
   return (
@@ -25,6 +41,8 @@ export default function CardForm({ setIsOpen }) {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-y-2 mt-3">
           <p className="font-nunito text-sm text-center">Fill this Form</p>
+          {message && <p className="text-sm text-center text-red-400 font-nunito">{message}</p>}
+          <input type="text" value={term} onChange={(e) => setTerm(e.target.value)} placeholder="term" className=" border text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
           <input
             type="text"
             value={definition}
@@ -32,7 +50,6 @@ export default function CardForm({ setIsOpen }) {
             placeholder="definition"
             className="border text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
           />
-          <input type="text" value={term} onChange={(e) => setTerm(e.target.value)} placeholder="term" className=" border text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
           <RadioGroup value={level} onChange={setLevel}>
             <div className="text-sm font-nunito flex justify-center gap-x-2">
               {levelOption.map((option) => (
