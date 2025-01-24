@@ -24,6 +24,31 @@ async function login(username, password) {
   return response;
 }
 
+async function get() {
+  let response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/current`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${localStorage.getItem("token")}`,
+    },
+  });
+  response = await response.json();
+  return response;
+}
+
+async function update(payload) {
+  let response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/current`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${localStorage.getItem("token")}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  response = await response.json();
+  return response;
+}
+
 async function logout() {
   let response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/logout`, {
     method: "DELETE",
@@ -36,4 +61,4 @@ async function logout() {
   return response;
 }
 
-export default { register, login, logout };
+export default { register, login, get, update, logout };

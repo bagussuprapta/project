@@ -10,6 +10,14 @@ export default function UserProvider({ children }) {
     return await userAPI.login(username, password);
   }
 
+  async function get() {
+    return await userAPI.get();
+  }
+
+  async function update(payload) {
+    return await userAPI.update(payload);
+  }
+
   async function logout() {
     await userAPI.logout();
   }
@@ -17,6 +25,8 @@ export default function UserProvider({ children }) {
   const providerValue = {
     register,
     login,
+    get,
+    update,
     logout,
   };
 
