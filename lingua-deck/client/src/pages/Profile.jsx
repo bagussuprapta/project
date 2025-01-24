@@ -1,12 +1,15 @@
 import { useContext, useEffect, useState } from "react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import Navbar from "../components/layout/Navbar";
 import { UserContext } from "../context/userContext";
+import CardForm from "../components/card/CardForm";
 
 export default function Profile() {
   const userProvider = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -67,7 +70,31 @@ export default function Profile() {
           <p className="text-center font-bold text-sm font-nunito">Your Attemp</p>
         </div>
         <div>
-          <p className="text-center font-bold text-sm font-nunito">Your Card</p>
+          <div className="flex gap-x-2 justify-center items-center">
+            <p className="text-center font-bold text-sm font-nunito">Your Card</p>
+            <button
+              onClick={() => setIsOpen(true)}
+              className="px-2 py-0 text-sm rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito text-white"
+            >
+              +
+            </button>
+          </div>
+          <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+            <DialogPanel>
+              <div className="fixed inset-0 items-center justify-center bg-stone-400 bg-opacity-60 flex">
+                <div className="w-80 flex flex-col gap-y-3">
+                  <div className="bg-white px-4 w-full py-3 pb-5 rounded-3xl border">
+                    <div className=" w-full">
+                      <p className="text-center font-nunito text-sm">Create Your Card</p>
+                    </div>
+                    <div className="flex justify-center">
+                      <CardForm setIsOpen={setIsOpen}></CardForm>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogPanel>
+          </Dialog>
         </div>
       </div>
     </div>
