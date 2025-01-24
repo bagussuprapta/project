@@ -18,22 +18,22 @@ const createFlashcardValidation = Joi.object({
     .custom((value, helpers) => {
       const words = value.split(" ");
       if (words.some((word) => !/^[a-zA-Z]+$/.test(word))) {
-        return helpers.message("each word must contain only letters.");
+        return helpers.message("category must contain only letters.");
       }
       if (words.length > 2) {
-        return helpers.message("input can have at most 2 words.");
+        return helpers.message("category can have at most 2 words.");
       }
       const totalLength = words.reduce((sum, word) => sum + word.length, 0);
       if (totalLength > 15) {
-        return helpers.message("the total length of both words must not exceed 15 characters.");
+        return helpers.message("category length must not exceed 15 characters.");
       }
       return value;
     })
     .messages({
       "string.empty": "category cannot be empty.",
     }),
-  part_of_speech: Joi.string().valid("noun", "adjective", "adverb", "preposition").required(),
-  example_sentence: Joi.string().optional(),
+  part_of_speech: Joi.string().valid("noun", "verb", "adjective", "adverb", "preposition").required(),
+  example_sentence: Joi.string().optional().allow(""),
 });
 
 export { createFlashcardValidation };
