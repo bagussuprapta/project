@@ -22,4 +22,13 @@ const get = async (request, response, next) => {
   }
 };
 
-export default { create, get };
+const getAll = async (request, response, next) => {
+  try {
+    const result = await flashcardService.getAll(request.query);
+    response.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, get, getAll };

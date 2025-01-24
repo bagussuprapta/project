@@ -7,5 +7,6 @@ publicRouter.post("/api/users", userController.register);
 publicRouter.post("/api/users/login", userController.login);
 
 publicRouter.get("/api/flashcards/:card_id", flashcardController.get);
+publicRouter.get("/api/flashcards", flashcardController.getAll);
 
 export { publicRouter };

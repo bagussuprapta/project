@@ -40,4 +40,9 @@ const getFlashcardValidation = Joi.object({
   card_id: Joi.number().positive().required(),
 });
 
-export { createFlashcardValidation, getFlashcardValidation };
+const getFlashcardQueryValidation = Joi.object({
+  page: Joi.number().positive().required(),
+  pageSize: Joi.number().positive().required(),
+});
+
+export { createFlashcardValidation, getFlashcardValidation, getFlashcardQueryValidation };

@@ -128,6 +128,20 @@ describe("POST /api/flashcards", function () {
   });
 });
 
+describe("GET /api/flashcards", function () {
+  it("should can get all flashcard", async () => {
+    const result = await supertest(web).get("/api/flashcards?page=1&pageSize=10");
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should return error if query page not a number", async () => {
+    const result = await supertest(web).get("/api/flashcards?page=abc&pageSize=10");
+    expect(result.status).toBe(400);
+    expect(result.body.error).toBeDefined();
+  });
+});
+
 describe("GET /api/flashcard/:card_id", function () {
   beforeEach(async () => {
     await createTestFlashcard();
