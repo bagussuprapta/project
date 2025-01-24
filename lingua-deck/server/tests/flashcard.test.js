@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import { web } from "../src/apps/web.js";
-import { createTestUser, removeTodayTestFlashcard, removeTestUser } from "./test-util";
+import { createTestUser, removeTodayTestFlashcard, removeTestUser, createTestFlashcard, getTestFlashcard } from "./test-util";
 
 describe("POST /api/flashcards", function () {
   beforeEach(async () => {
@@ -32,7 +32,7 @@ describe("POST /api/flashcards", function () {
     expect(result.body.data.example_sentence).toBe("This is an example sentence.");
   });
 
-  it("should return 400 when term contains invalid characters", async () => {
+  it("should error when term contains invalid characters", async () => {
     const result = await supertest(web).post("/api/flashcards").set("Authorization", "test").send({
       term: "apple123, basket",
       definition: "A definition of a term.",
@@ -45,7 +45,7 @@ describe("POST /api/flashcards", function () {
     expect(result.body.error).toBeDefined();
   });
 
-  it("should return 400 when definition exceeds maximum length", async () => {
+  it("should error when definition exceeds maximum length", async () => {
     const result = await supertest(web)
       .post("/api/flashcards")
       .set("Authorization", "test")
@@ -61,7 +61,7 @@ describe("POST /api/flashcards", function () {
     expect(result.body.error).toBeDefined();
   });
 
-  it("should return 400 when level is invalid", async () => {
+  it("should error when level is invalid", async () => {
     const result = await supertest(web).post("/api/flashcards").set("Authorization", "test").send({
       term: "apple",
       definition: "A definition of a term.",
@@ -74,7 +74,7 @@ describe("POST /api/flashcards", function () {
     expect(result.body.error).toBeDefined();
   });
 
-  it("should return 400 when category contains invalid characters", async () => {
+  it("should error when category contains invalid characters", async () => {
     const result = await supertest(web).post("/api/flashcards").set("Authorization", "test").send({
       term: "apple",
       definition: "A definition of a term.",
@@ -87,7 +87,7 @@ describe("POST /api/flashcards", function () {
     expect(result.body.error).toBeDefined();
   });
 
-  it("should return 400 when category exceeds 2 words or total length exceeds 15", async () => {
+  it("should error when category exceeds 2 words and more than 15 characters", async () => {
     const result = await supertest(web).post("/api/flashcards").set("Authorization", "test").send({
       term: "apple",
       definition: "A definition of a term.",
@@ -100,20 +100,20 @@ describe("POST /api/flashcards", function () {
     expect(result.body.error).toBeDefined();
   });
 
-  it("should return 400 when part of speech is invalid", async () => {
+  it("should error when part of speech is invalid", async () => {
     const result = await supertest(web).post("/api/flashcards").set("Authorization", "test").send({
       term: "apple",
       definition: "A definition of a term.",
       level: "beginner",
       category: "fruit basket",
-      part_of_speech: "verb",
+      part_of_speech: "random",
     });
 
     expect(result.status).toBe(400);
     expect(result.body.error).toBeDefined();
   });
 
-  it("should return 200 when example sentence is not provided (optional)", async () => {
+  it("should return 200 when example sentence is not provided", async () => {
     const result = await supertest(web).post("/api/flashcards").set("Authorization", "test").send({
       term: "apple",
       definition: "A definition of a term.",
@@ -125,5 +125,31 @@ describe("POST /api/flashcards", function () {
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
     expect(result.body.data.example_sentence).toBeNull();
+  });
+});
+
+describe("GET /api/flashcard/:card_id", function () {
+  beforeEach(async () => {
+    await createTestFlashcard();
+  });
+
+  afterEach(async () => {
+    await removeTodayTestFlashcard();
+    await removeTestUser();
+  });
+
+  it("should can get flashcard", async () => {
+    const testFlashcard = await getTestFlashcard();
+    const result = await supertest(web).get("/api/flashcards/" + testFlashcard.card_id);
+
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBeDefined();
+  });
+
+  it("should error if card id not valid", async () => {
+    const result = await supertest(web).get("/api/flashcards/notanid");
+
+    expect(result.status).toBe(400);
+    expect(result.body.error).toBeDefined();
   });
 });

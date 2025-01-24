@@ -36,4 +36,8 @@ const createFlashcardValidation = Joi.object({
   example_sentence: Joi.string().optional().allow(""),
 });
 
-export { createFlashcardValidation };
+const getFlashcardValidation = Joi.object({
+  card_id: Joi.number().positive().required(),
+});
+
+export { createFlashcardValidation, getFlashcardValidation };

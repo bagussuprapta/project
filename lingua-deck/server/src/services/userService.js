@@ -19,6 +19,7 @@ const register = async (request) => {
   return await prismaClient.user.create({
     data: user,
     select: {
+      user_id: true,
       username: true,
     },
   });

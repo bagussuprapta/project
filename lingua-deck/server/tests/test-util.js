@@ -10,7 +10,7 @@ export const removeTestUser = async (username = "test") => {
 };
 
 export const createTestUser = async () => {
-  await prismaClient.user.create({
+  return await prismaClient.user.create({
     data: {
       username: "test",
       email: "test@test.com",
@@ -32,6 +32,30 @@ export const removeTodayTestFlashcard = async (term = "test") => {
         gte: startOfDay,
         lte: endOfDay,
       },
+    },
+  });
+};
+
+export const createTestFlashcard = async () => {
+  const testUser = await createTestUser();
+
+  await prismaClient.flashcard.create({
+    data: {
+      user_id: testUser.user_id,
+      term: "test",
+      definition: "test",
+      level: "beginner",
+      category: "test test",
+      part_of_speech: "noun",
+      example_sentence: "test",
+    },
+  });
+};
+
+export const getTestFlashcard = async () => {
+  return await prismaClient.flashcard.findFirst({
+    where: {
+      term: "test",
     },
   });
 };

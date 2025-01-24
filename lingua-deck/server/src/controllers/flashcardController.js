@@ -11,4 +11,15 @@ const create = async (request, response, next) => {
   }
 };
 
-export default { create };
+const get = async (request, response, next) => {
+  try {
+    const result = await flashcardService.get(request.params);
+    response.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, get };
