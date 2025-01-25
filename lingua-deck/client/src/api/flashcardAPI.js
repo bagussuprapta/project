@@ -11,4 +11,15 @@ async function create(payload) {
   return response;
 }
 
-export default { create };
+async function getAll(page, pageSize) {
+  let response = await fetch(`${import.meta.env.VITE_API_URL}/api/flashcards?page=${page}&pageSize=${pageSize}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  response = await response.json();
+  return response;
+}
+
+export default { create, getAll };

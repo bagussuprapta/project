@@ -6,7 +6,11 @@ export default function FlashcardProvider({ children }) {
     return await flashcardAPI.create(payload);
   }
 
-  const providerValue = { create };
+  async function getAll(page, pageSize) {
+    return await flashcardAPI.getAll(page, pageSize);
+  }
+
+  const providerValue = { create, getAll };
 
   return <FlashcardContext.Provider value={providerValue}>{children}</FlashcardContext.Provider>;
 }

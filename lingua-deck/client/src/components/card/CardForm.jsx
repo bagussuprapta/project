@@ -36,7 +36,7 @@ export default function CardForm({ setIsOpen }) {
   return (
     <div>
       <div className=" flex justify-center">
-        <Flashcard></Flashcard>
+        <Flashcard category={category} level={level} partOfSpeech={partOfSpeech}></Flashcard>
       </div>
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-y-2 mt-3">
