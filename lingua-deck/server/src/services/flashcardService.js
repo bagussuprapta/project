@@ -33,6 +33,21 @@ const getAll = async (query) => {
   const queriedFlashcard = await prismaClient.flashcard.findMany({
     skip,
     take: pageSize,
+    select: {
+      card_id: true,
+      definition: true,
+      level: true,
+      category: true,
+      part_of_speech: true,
+      example_sentence: true,
+      created_at: true,
+      updated_at: true,
+      user: {
+        select: {
+          username: true,
+        },
+      },
+    },
   });
   const totalFlashcard = await prismaClient.flashcard.count();
   return {
