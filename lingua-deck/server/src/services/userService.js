@@ -69,6 +69,7 @@ const get = async (request) => {
       username: true,
       email: true,
       preferred_language: true,
+      flashcards: true,
     },
   });
 
