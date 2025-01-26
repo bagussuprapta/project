@@ -4,6 +4,7 @@ import Navbar from "../components/layout/Navbar";
 import { UserContext } from "../context/userContext";
 import CardForm from "../components/card/CardForm";
 import { FlashcardContext } from "../context/flashcardContext";
+import Flashcard from "../components/card/Flashcard";
 
 export default function Profile() {
   const userProvider = useContext(UserContext);
@@ -13,6 +14,7 @@ export default function Profile() {
   const [preferredLanguage, setPreferredLanguage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isImport, setIsImport] = useState(false);
+  const [userFlashcards, setUserFlashcards] = useState([]);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
@@ -25,6 +27,7 @@ export default function Profile() {
         setUsername(result.data.username);
         setEmail(result.data.email);
         setPreferredLanguage(result.data.preferred_language);
+        setUserFlashcards(result.data.flashcards);
       }
     }
     getUser();
@@ -103,6 +106,15 @@ export default function Profile() {
             >
               Import
             </button>
+          </div>
+          <div>
+            <div className="mt-14 flex flex-wrap justify-center gap-x-1 gap-y-1">
+              {userFlashcards.map((flashcard, index) => (
+                <div key={index}>
+                  <Flashcard level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
+                </div>
+              ))}
+            </div>
           </div>
           <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
             <DialogPanel>
