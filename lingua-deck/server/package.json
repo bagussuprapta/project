@@ -18,8 +18,11 @@
     "@prisma/client": "6.2.1",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
+    "csv-parser": "^3.1.0",
     "express": "^4.21.2",
     "joi": "^17.13.3",
+    "multer": "^1.4.5-lts.1",
+    "strip-bom": "^5.0.0",
     "uuid": "^11.0.5",
     "winston": "^3.17.0"
   },

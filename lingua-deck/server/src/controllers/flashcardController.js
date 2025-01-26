@@ -11,6 +11,17 @@ const create = async (request, response, next) => {
   }
 };
 
+const importFlashcard = async (request, response, next) => {
+  try {
+    const result = await flashcardService.importFlashcard(request.user, request);
+    response.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const get = async (request, response, next) => {
   try {
     const result = await flashcardService.get(request.params);
@@ -31,4 +42,4 @@ const getAll = async (request, response, next) => {
   }
 };
 
-export default { create, get, getAll };
+export default { create, importFlashcard, get, getAll };
