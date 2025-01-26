@@ -11,6 +11,18 @@ async function create(payload) {
   return response;
 }
 
+async function importFlashcard(formData) {
+  let response = await fetch(`${import.meta.env.VITE_API_URL}/api/import/flashcards`, {
+    method: "POST",
+    headers: {
+      Authorization: `${localStorage.getItem("token")}`,
+    },
+    body: formData,
+  });
+  response = await response.json();
+  return response;
+}
+
 async function getAll(page, pageSize) {
   let response = await fetch(`${import.meta.env.VITE_API_URL}/api/flashcards?page=${page}&pageSize=${pageSize}`, {
     method: "GET",
@@ -22,4 +34,4 @@ async function getAll(page, pageSize) {
   return response;
 }
 
-export default { create, getAll };
+export default { create, importFlashcard, getAll };

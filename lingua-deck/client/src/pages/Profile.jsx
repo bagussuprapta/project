@@ -3,13 +3,17 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import Navbar from "../components/layout/Navbar";
 import { UserContext } from "../context/userContext";
 import CardForm from "../components/card/CardForm";
+import { FlashcardContext } from "../context/flashcardContext";
 
 export default function Profile() {
   const userProvider = useContext(UserContext);
+  const flashcardProvider = useContext(FlashcardContext);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isImport, setIsImport] = useState(false);
+  const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -34,6 +38,21 @@ export default function Profile() {
     } else {
       setMessage("");
     }
+  }
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]); // Menyimpan file yang dipilih ke state
+  };
+
+  async function handleImport(event) {
+    event.preventDefault();
+    if (!file) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", file);
+    await flashcardProvider.importFlashcards(formData);
+    setIsImport(false);
   }
 
   return (
@@ -78,6 +97,12 @@ export default function Profile() {
             >
               +
             </button>
+            <button
+              onClick={() => setIsImport(true)}
+              className="px-2 py-0 text-sm rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito text-white"
+            >
+              Import
+            </button>
           </div>
           <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
             <DialogPanel>
@@ -89,6 +114,37 @@ export default function Profile() {
                     </div>
                     <div className="flex justify-center">
                       <CardForm setIsOpen={setIsOpen}></CardForm>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </DialogPanel>
+          </Dialog>
+          <Dialog open={isImport} onClose={() => setIsImport(false)} className="relative z-50">
+            <DialogPanel>
+              <div className="fixed inset-0 items-center justify-center bg-stone-400 bg-opacity-60 flex">
+                <div className="w-80 flex flex-col gap-y-3">
+                  <div className="bg-white px-4 w-full py-3 pb-3 rounded-3xl border">
+                    <div className=" w-full">
+                      <p className="text-center font-nunito text-sm">Import Your Card</p>
+                    </div>
+                    <div className="flex justify-center">
+                      <div>
+                        <form onSubmit={handleImport}>
+                          <input type="file" onChange={handleFileChange} />
+                          <div className="w-full flex gap-4 justify-center">
+                            <button
+                              onClick={() => {
+                                setIsImport(false);
+                              }}
+                              className="font-nunito text-sm bg-rose-700 text-white px-2 py-0.5 rounded"
+                            >
+                              Cancel
+                            </button>
+                            <button className="font-nunito text-sm bg-[#826933] text-white px-2 py-0.5 rounded">Import</button>
+                          </div>
+                        </form>
+                      </div>
                     </div>
                   </div>
                 </div>
