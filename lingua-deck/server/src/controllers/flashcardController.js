@@ -42,4 +42,13 @@ const getAll = async (request, response, next) => {
   }
 };
 
-export default { create, importFlashcard, get, getAll };
+const deleteCard = async (request, response, next) => {
+  try {
+    const result = await flashcardService.deleteCard(request.user, request.params);
+    response.status(200).json({ data: result });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, importFlashcard, get, getAll, deleteCard };

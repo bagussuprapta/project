@@ -1,5 +1,5 @@
 import { validator } from "../validations/validator.js";
-import { createFlashcardValidation, getFlashcardQueryValidation, getFlashcardValidation } from "../validations/flashcardValidation.js";
+import { createFlashcardValidation, deleteFlashcardValidation, getFlashcardQueryValidation, getFlashcardValidation } from "../validations/flashcardValidation.js";
 import { prismaClient } from "../apps/database.js";
 import { ResponseError } from "../errors/responseError.js";
 import csvParser from "csv-parser";
@@ -101,4 +101,24 @@ const getAll = async (query) => {
   };
 };
 
-export default { create, importFlashcard, get, getAll };
+const deleteCard = async (user, card) => {
+  const validatedCard = validator(deleteFlashcardValidation, { user_id: user.user_id, card_id: card.card_id });
+  const queriedCard = await prismaClient.flashcard.findFirst({
+    where: {
+      card_id: validatedCard.card_id,
+    },
+  });
+  if (queriedCard.user_id !== user.user_id) {
+    throw new ResponseError(403, "you do not have permission to delete this flashcard");
+  }
+  return await prismaClient.flashcard.delete({
+    where: {
+      card_id: validatedCard.card_id,
+    },
+    include: {
+      flashcard_attempts: true,
+    },
+  });
+};
+
+export default { create, importFlashcard, get, getAll, deleteCard };
