@@ -14,7 +14,11 @@ export default function FlashcardProvider({ children }) {
     return await flashcardAPI.getAll(page, pageSize);
   }
 
-  const providerValue = { create, importFlashcards, getAll };
+  async function deleteFlashcard(cardID) {
+    return await flashcardAPI.deleteFlashcard(cardID);
+  }
+
+  const providerValue = { create, importFlashcards, getAll, deleteFlashcard };
 
   return <FlashcardContext.Provider value={providerValue}>{children}</FlashcardContext.Provider>;
 }

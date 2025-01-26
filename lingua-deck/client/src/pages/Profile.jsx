@@ -58,6 +58,11 @@ export default function Profile() {
     setIsImport(false);
   }
 
+  async function handleDelete(cardID) {
+    const response = await flashcardProvider.deleteFlashcard(cardID);
+    console.log(response);
+  }
+
   return (
     <div>
       <div className="px-2">
@@ -110,8 +115,21 @@ export default function Profile() {
           <div>
             <div className="mt-14 flex flex-wrap justify-center gap-x-1 gap-y-1">
               {userFlashcards.map((flashcard, index) => (
-                <div key={index}>
+                <div key={index} className="flex flex-col">
                   <Flashcard level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
+                  <div className="flex gap-x-2 px-3">
+                    <button
+                      onClick={() => {
+                        handleDelete(flashcard.card_id);
+                      }}
+                      className="w-full mt-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-rose-700 shadow-rose-light hover:shadow-rose-normal border border-red-700 font-nunito font-bold text-white"
+                    >
+                      Delete
+                    </button>
+                    <button className="w-full mt-3 py-1 text-xs rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito font-bold text-white">
+                      Update
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

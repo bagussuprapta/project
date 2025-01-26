@@ -34,4 +34,16 @@ async function getAll(page, pageSize) {
   return response;
 }
 
-export default { create, importFlashcard, getAll };
+async function deleteFlashcard(cardID) {
+  let response = await fetch(`${import.meta.env.VITE_API_URL}/api/flashcards/${cardID}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${localStorage.getItem("token")}`,
+    },
+  });
+  response = await response.json();
+  return response;
+}
+
+export default { create, importFlashcard, getAll, deleteFlashcard };
