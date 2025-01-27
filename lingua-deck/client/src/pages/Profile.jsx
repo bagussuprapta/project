@@ -15,6 +15,7 @@ export default function Profile() {
   const [isOpen, setIsOpen] = useState(false);
   const [isImport, setIsImport] = useState(false);
   const [userFlashcards, setUserFlashcards] = useState([]);
+  const [studySessions, setStudySessions] = useState([]);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
 
@@ -28,6 +29,7 @@ export default function Profile() {
         setEmail(result.data.email);
         setPreferredLanguage(result.data.preferred_language);
         setUserFlashcards(result.data.flashcards);
+        setStudySessions(result.data.study_sessions);
       }
     }
     getUser();
@@ -73,27 +75,56 @@ export default function Profile() {
             <p className="text-sm font-nunito">{message}</p>
           </div>
         )}
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-y-2 w-60">
-            <p className="text-center font-bold text-sm font-nunito">Your Profile</p>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
-            <input
-              type="text"
-              value={preferredLanguage}
-              onChange={(e) => setPreferredLanguage(e.target.value)}
-              placeholder="language"
-              className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
-            />
+        <div className="flex flex-col md:flex-row md:gap-x-5">
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-y-2 w-60">
+              <p className="text-center font-bold text-sm font-nunito">Your Profile</p>
+              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
+              <input
+                type="text"
+                value={preferredLanguage}
+                onChange={(e) => setPreferredLanguage(e.target.value)}
+                placeholder="language"
+                className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
+              />
+              <div className="flex justify-center">
+                <button className="w-full mt-3 py-1 text-sm rounded-lg bg-[#826933] font-nunito font-extrabold text-[#eae8e3]" type="submit">
+                  Update
+                </button>
+              </div>
+            </div>
+          </form>
+          <div>
+            <p className="text-center font-bold text-sm font-nunito">Study Session</p>
+            <div className="font-nunito text-sm border border-stone-300 rounded p-3">
+              <table>
+                <thead>
+                  <tr>
+                    <th className="px-6">Date</th>
+                    <th className="px-6">Total Card</th>
+                    <th className="px-6">Total Correct</th>
+                    <th className="px-6">Total Incorrect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studySessions.map((session, index) => {
+                    let date = session.session_date;
+                    date = new Date(date);
+                    date = date.toISOString().split("T")[0];
+                    return (
+                      <tr key={index}>
+                        <td className="text-center">{date}</td>
+                        <td className="text-center">{session.total_cards}</td>
+                        <td className="text-center">{session.total_correct}</td>
+                        <td className="text-center">{session.total_incorrect}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div className="flex justify-center">
-            <button className="w-full mt-3 py-1 text-sm rounded-lg bg-[#826933] font-nunito font-extrabold text-[#eae8e3]" type="submit">
-              Update
-            </button>
-          </div>
-        </form>
-        <div>
-          <p className="text-center font-bold text-sm font-nunito">Your Attemp</p>
         </div>
         <div>
           <div className="flex gap-x-2 justify-center items-center">
@@ -112,7 +143,7 @@ export default function Profile() {
             </button>
           </div>
           <div>
-            <div className="mt-14 flex flex-wrap justify-center gap-x-1 gap-y-1">
+            <div className="mt-3 flex flex-wrap justify-center gap-x-1 gap-y-1">
               {userFlashcards.map((flashcard, index) => (
                 <div key={index} className="flex flex-col">
                   <Flashcard level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
