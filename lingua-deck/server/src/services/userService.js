@@ -70,6 +70,7 @@ const get = async (request) => {
       email: true,
       preferred_language: true,
       flashcards: true,
+      study_sessions: true,
     },
   });
 
