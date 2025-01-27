@@ -1,8 +1,10 @@
 import express from "express";
+import multer from "multer";
 import userController from "../controllers/userController.js";
 import flashcardController from "../controllers/flashcardController.js";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import multer from "multer";
+import attemptController from "../controllers/attemptController.js";
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 const privateRouter = new express.Router();
@@ -14,5 +16,7 @@ privateRouter.delete("/api/users/logout", userController.logout);
 privateRouter.post("/api/flashcards", flashcardController.create);
 privateRouter.delete("/api/flashcards/:card_id", flashcardController.deleteCard);
 privateRouter.post("/api/import/flashcards", upload.single("file"), flashcardController.importFlashcard);
+
+privateRouter.post("/api/attempt/flashcards/:card_id", attemptController.attemptFlashcard);
 
 export { privateRouter };
