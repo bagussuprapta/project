@@ -1,6 +1,7 @@
 import { Badge } from "../ui/Badge";
 import Logo from "../icon/Logo";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AttemptContext } from "../../context/attemptContext";
 
 function BackCard({ handleFlip, level, category, partOfSpeech, username }) {
   return (
@@ -40,8 +41,19 @@ function BackCard({ handleFlip, level, category, partOfSpeech, username }) {
   );
 }
 
-function FrontCard({ handleFlip, definition }) {
-  const [term, setTerm] = useState();
+function FrontCard({ handleFlip, definition, cardID }) {
+  const [message, setMessage] = useState("");
+  const attemptProvider = useContext(AttemptContext);
+  const [term, setTerm] = useState("");
+
+  async function handleAttempt() {
+    const result = await attemptProvider.attemptFlashcard(cardID, term);
+    if (result?.error) {
+      setMessage(result.error.message);
+    } else if (result?.data) {
+      setMessage(result.data.message);
+    }
+  }
 
   return (
     <div className="flex flex-col justify-between h-full py-2">
@@ -52,7 +64,7 @@ function FrontCard({ handleFlip, definition }) {
         </div>
       </div>
       <div>
-        <p className="font-nunito text-xs text-center text-red-600">Work</p>
+        <p className="font-nunito text-xs text-center text-red-600">{message}</p>
         <input
           type="text"
           value={term}
@@ -70,7 +82,12 @@ function FrontCard({ handleFlip, definition }) {
         >
           GIVE UP
         </button>
-        <button className="w-full mt-3 py-1 text-xs rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito font-bold text-white">
+        <button
+          onClick={() => {
+            handleAttempt();
+          }}
+          className="w-full mt-3 py-1 text-xs rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito font-bold text-white"
+        >
           SUBMIT
         </button>
       </div>
@@ -78,7 +95,7 @@ function FrontCard({ handleFlip, definition }) {
   );
 }
 
-export default function Flashcard({ level, category, partOfSpeech, definition, username, reset }) {
+export default function Flashcard({ level, category, partOfSpeech, definition, username, reset, cardID }) {
   const [isFlip, setIsFlip] = useState(true);
 
   function handleFlip() {
@@ -91,7 +108,11 @@ export default function Flashcard({ level, category, partOfSpeech, definition, u
 
   return (
     <div className={`w-44 h-64 rounded-3xl py-2 px-3 border-b-[6px] border-[2px] border-stone-500 hover:border-stone-800 ${isFlip ? "bg-[#a7c3e4] hover:bg-[#9bb7d8]" : "bg-stone-100"}`}>
-      {isFlip ? <BackCard handleFlip={handleFlip} level={level} category={category} partOfSpeech={partOfSpeech} username={username} /> : <FrontCard handleFlip={handleFlip} definition={definition} />}
+      {isFlip ? (
+        <BackCard handleFlip={handleFlip} level={level} category={category} partOfSpeech={partOfSpeech} username={username} />
+      ) : (
+        <FrontCard handleFlip={handleFlip} definition={definition} cardID={cardID} />
+      )}
     </div>
   );
 }

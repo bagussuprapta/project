@@ -59,8 +59,7 @@ export default function Profile() {
   }
 
   async function handleDelete(cardID) {
-    const response = await flashcardProvider.deleteFlashcard(cardID);
-    console.log(response);
+    await flashcardProvider.deleteFlashcard(cardID);
   }
 
   return (

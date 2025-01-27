@@ -10,7 +10,7 @@ export default function Home() {
   const [pageSize] = useState(16);
   const [totalPages, setTotalPages] = useState(1);
   const [message, setMessage] = useState("");
-  const [resetKey, setResetKey] = useState(0); // Key untuk reset flashcards
+  const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
     const fetchFlashcard = async () => {
@@ -28,14 +28,14 @@ export default function Home() {
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
-      setResetKey((prev) => prev + 1); // Trigger reset
+      setResetKey((prev) => prev + 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
-      setResetKey((prev) => prev + 1); // Trigger reset
+      setResetKey((prev) => prev + 1);
     }
   };
 
@@ -45,7 +45,6 @@ export default function Home() {
         <Navbar />
       </div>
 
-      {/* Flashcards */}
       <div className="mt-14 flex flex-wrap justify-center gap-x-1 gap-y-1">
         {flashcards.map((flashcard, index) => (
           <div key={index}>
@@ -55,13 +54,13 @@ export default function Home() {
               partOfSpeech={flashcard.part_of_speech}
               definition={flashcard.definition}
               username={flashcard.user.username}
-              reset={resetKey} // Pass resetKey to trigger state reset
+              reset={resetKey}
+              cardID={flashcard.card_id}
             />
           </div>
         ))}
       </div>
 
-      {/* Pagination Controls */}
       <div className="mt-8 mb-8 flex justify-center items-center gap-4">
         <button onClick={handlePreviousPage} disabled={currentPage === 1} className={`px-2 text-sm font-nunito bg-gray-300 rounded ${currentPage === 1 ? "opacity-50" : ""}`}>
           Back
