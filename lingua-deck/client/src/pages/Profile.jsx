@@ -6,6 +6,12 @@ import CardForm from "../components/card/CardForm";
 import { FlashcardContext } from "../context/flashcardContext";
 import Flashcard from "../components/card/Flashcard";
 import studyAPI from "../api/studyAPI";
+import FormInput from "../components/ui/FormInput";
+import userAPI from "../api/userAPI";
+import Toast from "../components/ui/Toast";
+import ActionButton from "../components/ui/ActionButton";
+import Trash from "../components/icon/Trash";
+import Pencil from "../components/icon/Pencil";
 
 export default function Profile() {
   const userProvider = useContext(UserContext);
@@ -19,6 +25,7 @@ export default function Profile() {
   const [studySessions, setStudySessions] = useState([]);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
 
   useEffect(() => {
     async function getUser() {
@@ -34,17 +41,7 @@ export default function Profile() {
       }
     }
     getUser();
-  }, [userProvider]);
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    const result = await userProvider.update({ username, email, preferred_language: preferredLanguage });
-    if (result?.error) {
-      setMessage(result.error.message);
-    } else {
-      setMessage("");
-    }
-  }
+  }, [message, userProvider]);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -69,57 +66,50 @@ export default function Profile() {
     await studyAPI.exportStudySession();
   }
 
+  async function handleUpdateUser(event) {
+    event.preventDefault();
+    const result = await userAPI.update({ username, email, preferred_language: preferredLanguage });
+    if (result?.error) {
+      setMessageType("error");
+      setMessage(result.error.message);
+    } else {
+      setMessageType("");
+      setMessage("success update");
+    }
+  }
+
   return (
     <div>
-      <div className="px-2">
-        <Navbar />
-      </div>
-      <div className="mt-14 px-3 flex flex-col gap-y-4 items-center">
-        {message && (
-          <div>
-            <p className="text-sm font-nunito">{message}</p>
-          </div>
-        )}
-        <div className="flex flex-col md:flex-row md:gap-x-5">
-          <form onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-y-2 w-60">
-              <p className="text-center font-bold text-sm font-nunito">Your Profile</p>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="username" className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
-              <input
-                type="text"
-                value={preferredLanguage}
-                onChange={(e) => setPreferredLanguage(e.target.value)}
-                placeholder="language"
-                className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
-              />
-              <div className="flex justify-center">
-                <button className="w-full mt-3 py-1 text-sm rounded-lg bg-[#826933] font-nunito font-extrabold text-[#eae8e3]" type="submit">
-                  Update
-                </button>
+      <Navbar />
+      <Toast message={message} onClose={() => setMessage("")} type={messageType} />
+      <div className="mt-5 px-80">
+        <div className="flex gap-x-3">
+          <div className="border px-5 py-3 rounded-2xl border-b-[6px] bg-stone-100">
+            <p className="text-center font-bold text-sm font-nunito">Your Profile</p>
+            <form onSubmit={handleUpdateUser} className="mt-3">
+              <div className="flex flex-col gap-y-1 w-56">
+                <FormInput type="text" value={username} onChange={setUsername} placeholder="username" />
+                <FormInput type="text" value={email} onChange={setEmail} placeholder="email" />
+                <FormInput type="text" value={preferredLanguage} onChange={setPreferredLanguage} placeholder="lang code 'en'" />
               </div>
+              <div className="mt-3 flex justify-center">
+                <ActionButton type="submit" text="Update" color="chestnut" />
+              </div>
+            </form>
+          </div>
+          <div className="w-full border px-6 py-3 rounded-2xl border-b-[6px] bg-stone-100">
+            <div className="flex items-center justify-center gap-x-3">
+              <p className="font-bold text-sm font-nunito">Study Session</p>
+              <ActionButton text="Export" color="liver" onClick={handleExportStudySession} />
             </div>
-          </form>
-          <div>
-            <div className="flex gap-x-2 justify-center items-center">
-              <p className="text-center font-bold text-sm font-nunito">Study Session</p>
-              <button
-                onClick={() => {
-                  handleExportStudySession();
-                }}
-                className="px-2 py-0 text-sm rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito text-white"
-              >
-                Export
-              </button>
-            </div>
-            <div className="font-nunito text-sm border border-stone-300 rounded p-3 mt-3">
-              <table>
+            <div className="text-sm font-nunito border rounded-md mt-3">
+              <table className="w-full">
                 <thead>
                   <tr>
-                    <th className="px-6">Date</th>
-                    <th className="px-6">Total Card</th>
-                    <th className="px-6">Total Correct</th>
-                    <th className="px-6">Total Incorrect</th>
+                    <th className="px-10 bg-stone-200">Date</th>
+                    <th className="px-2 bg-stone-200">Total Card</th>
+                    <th className="px-2 bg-stone-200">Total Correct</th>
+                    <th className="px-2 bg-stone-200">Total Incorrect</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -141,44 +131,40 @@ export default function Profile() {
             </div>
           </div>
         </div>
+      </div>
+      {/** Flashcard */}
+      <div className="mt-5 px-11">
+        <div className="flex gap-x-3 items-center justify-center">
+          <p className="font-bold text-sm font-nunito">Your Flashcards</p>
+          <ActionButton
+            text="Add"
+            color="hookers"
+            onClick={() => {
+              setIsOpen(true);
+            }}
+          />
+          <ActionButton text="Import" color="liver" onClick={() => setIsImport(true)} />
+        </div>
         <div>
-          <div className="flex gap-x-2 justify-center items-center">
-            <p className="text-center font-bold text-sm font-nunito">Your Card</p>
-            <button
-              onClick={() => setIsOpen(true)}
-              className="px-2 py-0 text-sm rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito text-white"
-            >
-              +
-            </button>
-            <button
-              onClick={() => setIsImport(true)}
-              className="px-2 py-0 text-sm rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito text-white"
-            >
-              Import
-            </button>
-          </div>
-          <div>
-            <div className="mt-3 flex flex-wrap justify-center gap-x-1 gap-y-1">
-              {userFlashcards.map((flashcard, index) => (
-                <div key={index} className="flex flex-col">
-                  <Flashcard level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
-                  <div className="flex gap-x-2 px-3">
-                    <button
-                      onClick={() => {
-                        handleDelete(flashcard.card_id);
-                      }}
-                      className="w-full mt-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-rose-700 shadow-rose-light hover:shadow-rose-normal border border-red-700 font-nunito font-bold text-white"
-                    >
-                      Delete
-                    </button>
-                    <button className="w-full mt-3 py-1 text-xs rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito font-bold text-white">
-                      Update
-                    </button>
-                  </div>
+          <div className="mt-3 flex flex-wrap justify-center gap-x-1 gap-y-1">
+            {userFlashcards.map((flashcard, index) => (
+              <div key={index} className="flex flex-col">
+                <Flashcard level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
+                <div className="flex justify-center items-center gap-x-7 mt-2">
+                  <Trash
+                    onClick={() => {
+                      handleDelete(flashcard.card_id);
+                    }}
+                  />
+                  <Pencil />
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
+        </div>
+      </div>
+      <div className="mt-14 px-3 flex flex-col gap-y-4 items-center">
+        <div>
           <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
             <DialogPanel>
               <div className="fixed inset-0 items-center justify-center bg-stone-400 bg-opacity-60 flex">
