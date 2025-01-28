@@ -7,11 +7,17 @@ const registerUserValidation = Joi.object({
     .required()
     .pattern(/^[A-Za-z]+$/)
     .messages({
-      "string.pattern.base": "username must contain only letters.",
+      "string.pattern.base": "username must contain only letters",
     }),
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required().messages(),
-  preferred_language: Joi.string().required().max(2),
+  preferred_language: Joi.string()
+    .required()
+    .max(2)
+    .pattern(/^[A-Za-z]{1,2}$/)
+    .messages({
+      "string.pattern.base": "preferred language must contain only letters",
+    }),
 });
 
 const loginUserValidation = Joi.object({
@@ -21,7 +27,7 @@ const loginUserValidation = Joi.object({
     .required()
     .pattern(/^[A-Za-z]+$/)
     .messages({
-      "string.pattern.base": "username must contain only letters.",
+      "string.pattern.base": "username must contain only letters",
     }),
   password: Joi.string().min(6).required().messages(),
 });
