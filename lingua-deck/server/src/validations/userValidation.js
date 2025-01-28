@@ -39,9 +39,22 @@ const getUserValidation = Joi.object({
 
 const updateUserValidation = Joi.object({
   user_id: Joi.number().required(),
-  username: Joi.string().min(3).max(50).optional(),
+  username: Joi.string()
+    .min(3)
+    .max(50)
+    .optional()
+    .pattern(/^[A-Za-z]+$/)
+    .messages({
+      "string.pattern.base": "username must contain only letters",
+    }),
   email: Joi.string().email().optional(),
-  preferred_language: Joi.string().optional().max(2),
+  preferred_language: Joi.string()
+    .optional()
+    .max(2)
+    .pattern(/^[A-Za-z]{1,2}$/)
+    .messages({
+      "string.pattern.base": "preferred language must contain only letters",
+    }),
 });
 
 export { registerUserValidation, loginUserValidation, getUserValidation, updateUserValidation };
