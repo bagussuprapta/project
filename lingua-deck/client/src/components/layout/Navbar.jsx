@@ -13,7 +13,7 @@ export default function Navbar() {
   }
 
   return (
-    <header className="px-48 mt-4 font-nunito text-white text-sm">
+    <header className="px-2 md:px-48 mt-4 font-nunito text-white text-sm">
       <div className="flex gap-x-4 justify-between border-b-4 border-[#232222] bg-[#a4b9b5] rounded-2xl border-2 px-4 py-3">
         <div className="flex gap-x-4">
           <Link to="/">Home</Link>
