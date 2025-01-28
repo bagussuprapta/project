@@ -5,6 +5,7 @@ import { UserContext } from "../context/userContext";
 import CardForm from "../components/card/CardForm";
 import { FlashcardContext } from "../context/flashcardContext";
 import Flashcard from "../components/card/Flashcard";
+import studyAPI from "../api/studyAPI";
 
 export default function Profile() {
   const userProvider = useContext(UserContext);
@@ -46,7 +47,7 @@ export default function Profile() {
   }
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]); // Menyimpan file yang dipilih ke state
+    setFile(e.target.files[0]);
   };
 
   async function handleImport(event) {
@@ -62,6 +63,10 @@ export default function Profile() {
 
   async function handleDelete(cardID) {
     await flashcardProvider.deleteFlashcard(cardID);
+  }
+
+  async function handleExportStudySession() {
+    await studyAPI.exportStudySession();
   }
 
   return (
@@ -96,8 +101,18 @@ export default function Profile() {
             </div>
           </form>
           <div>
-            <p className="text-center font-bold text-sm font-nunito">Study Session</p>
-            <div className="font-nunito text-sm border border-stone-300 rounded p-3">
+            <div className="flex gap-x-2 justify-center items-center">
+              <p className="text-center font-bold text-sm font-nunito">Study Session</p>
+              <button
+                onClick={() => {
+                  handleExportStudySession();
+                }}
+                className="px-2 py-0 text-sm rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito text-white"
+              >
+                Export
+              </button>
+            </div>
+            <div className="font-nunito text-sm border border-stone-300 rounded p-3 mt-3">
               <table>
                 <thead>
                   <tr>
