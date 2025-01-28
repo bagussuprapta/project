@@ -1,51 +1,36 @@
 import { Link } from "react-router";
 import { useContext } from "react";
 import { AuthContext } from "../../context/authContext";
-import { UserContext } from "../../context/userContext";
+import userAPI from "../../api/userAPI";
 
 export default function Navbar() {
   const authProvider = useContext(AuthContext);
-  const userProvider = useContext(UserContext);
+
+  async function handleLogout() {
+    userAPI.logout();
+    localStorage.clear("token");
+    authProvider.setIsLoggedIn(false);
+  }
 
   return (
-    <header className="fixed top-0 left-1 right-1 z-50">
-      <div className="flex gap-x-4 justify-between border-b-4 font-mono border-[#232222] bg-[#37463c] rounded-b-2xl border-x-2 px-4 py-3">
-        <ol className="flex gap-x-4">
-          <li>
-            <Link className="text-[#b6cde8] hover:text-white" to="/">
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link className="text-[#b6cde8] hover:text-white" to="/about">
-              About
-            </Link>
-          </li>
-        </ol>
-        <ol>
+    <header className="px-48 mt-4 font-nunito text-white text-sm">
+      <div className="flex gap-x-4 justify-between border-b-4 border-[#232222] bg-[#a4b9b5] rounded-2xl border-2 px-4 py-3">
+        <div className="flex gap-x-4">
+          <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
+        </div>
+        <div>
           {authProvider.isLoggedIn ? (
-            <li className="flex gap-x-4">
-              <Link className="text-[#b6cde8] hover:text-white" to="/profile">
-                Profile
-              </Link>
-              <Link
-                onClick={() => {
-                  userProvider.logout();
-                  authProvider.setIsLoggedIn(false);
-                  localStorage.clear("token");
-                }}
-                className="text-[#b6cde8] hover:text-white"
-                to="/"
-              >
+            <div className="flex gap-x-4">
+              <Link to="/profile">Profile</Link>
+              <Link className="bg-[#d5432c] px-2 rounded-md" onClick={handleLogout} to="/">
                 Logout
               </Link>
-            </li>
+            </div>
           ) : (
-            <Link className="text-[#b6cde8] hover:text-white" to="/login">
-              Login
-            </Link>
+            <Link to="/login">Login</Link>
           )}
-        </ol>
+        </div>
       </div>
     </header>
   );
