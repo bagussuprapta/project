@@ -149,15 +149,24 @@ const deleteCard = async (user, card) => {
       card_id: validatedCard.card_id,
     },
   });
+
+  if (!queriedCard) {
+    throw new ResponseError(404, "flashcard not found");
+  }
+
   if (queriedCard.user_id !== user.user_id) {
     throw new ResponseError(403, "you do not have permission to delete this flashcard");
   }
-  return await prismaClient.flashcard.delete({
+
+  await prismaClient.flashcardAttempt.deleteMany({
     where: {
       card_id: validatedCard.card_id,
     },
-    include: {
-      flashcard_attempts: true,
+  });
+
+  return await prismaClient.flashcard.delete({
+    where: {
+      card_id: validatedCard.card_id,
     },
   });
 };
