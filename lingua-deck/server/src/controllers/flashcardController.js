@@ -33,6 +33,15 @@ const get = async (request, response, next) => {
   }
 };
 
+const getAllCreatedByUser = async (request, response, next) => {
+  try {
+    const result = await flashcardService.getAllCreatedByUser(request.user, request.query);
+    response.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getAll = async (request, response, next) => {
   try {
     const result = await flashcardService.getAll(request.query);
@@ -51,4 +60,4 @@ const deleteCard = async (request, response, next) => {
   }
 };
 
-export default { create, importFlashcard, get, getAll, deleteCard };
+export default { create, importFlashcard, get, getAllCreatedByUser, getAll, deleteCard };

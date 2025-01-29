@@ -66,6 +66,47 @@ const get = async (request) => {
   return queriedFlashcard;
 };
 
+const getAllCreatedByUser = async (user, query) => {
+  const { page, pageSize } = validator(getFlashcardQueryValidation, query);
+  const skip = (page - 1) * pageSize;
+  const queriedFlashcard = await prismaClient.flashcard.findMany({
+    where: {
+      user_id: user.user_id,
+    },
+    skip,
+    take: pageSize,
+    select: {
+      card_id: true,
+      definition: true,
+      level: true,
+      category: true,
+      part_of_speech: true,
+      example_sentence: true,
+      created_at: true,
+      updated_at: true,
+      user: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+  const totalFlashcard = await prismaClient.flashcard.count({
+    where: {
+      user_id: user.user_id,
+    },
+  });
+  return {
+    data: queriedFlashcard,
+    meta: {
+      currentPage: page,
+      pageSize: pageSize,
+      totalData: totalFlashcard,
+      totalPages: Math.ceil(totalFlashcard / pageSize),
+    },
+  };
+};
+
 const getAll = async (query) => {
   const { page, pageSize } = validator(getFlashcardQueryValidation, query);
   const skip = (page - 1) * pageSize;
@@ -121,4 +162,4 @@ const deleteCard = async (user, card) => {
   });
 };
 
-export default { create, importFlashcard, get, getAll, deleteCard };
+export default { create, importFlashcard, get, getAllCreatedByUser, getAll, deleteCard };
