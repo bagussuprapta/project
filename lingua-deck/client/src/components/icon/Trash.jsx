@@ -1,10 +1,10 @@
 export default function Trash({ onClick }) {
   return (
-    <svg onClick={onClick} className="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="none" viewBox="0 0 16 20">
+    <svg onClick={onClick} className="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="15" height="18" fill="none" viewBox="0 0 15 18">
       <path
-        fill="#a22e2b"
+        fill="#C54E37"
         fillRule="evenodd"
-        d="M5.406.89A2 2 0 0 1 7.07 0h1.86a2 2 0 0 1 1.664.89l.906 1.36h3.75a.75.75 0 0 1 0 1.5H.75a.75.75 0 0 1 0-1.5H4.5zM11 20H5a4 4 0 0 1-4-4V5h14v11a4 4 0 0 1-4 4M6 8.25a.75.75 0 0 1 .75.75v7a.75.75 0 0 1-1.5 0V9A.75.75 0 0 1 6 8.25m4 0a.75.75 0 0 1 .75.75v7a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75"
+        d="M4.5 18h5.4a3.6 3.6 0 0 0 3.6-3.6V4.5H.9v9.9A3.6 3.6 0 0 0 4.5 18m1.575-9.9a.675.675 0 1 0-1.35 0v6.3a.675.675 0 1 0 1.35 0zm3.6 0a.675.675 0 1 0-1.35 0v6.3a.675.675 0 0 0 1.35 0zM6.363 0a1.8 1.8 0 0 0-1.497.802L4.05 2.025H.675a.675.675 0 0 0 0 1.35h13.05a.675.675 0 1 0 0-1.35H10.35L9.534.802A1.8 1.8 0 0 0 8.037 0z"
         clipRule="evenodd"
       ></path>
     </svg>
