@@ -79,16 +79,17 @@ export default function Profile() {
     formData.append("file", file);
     await flashcardAPI.importFlashcard(formData);
     setIsImport(false);
+    fetchFlashcards();
   }
 
   async function handleDelete(cardID) {
     const result = await flashcardAPI.deleteFlashcard(cardID);
     if (result?.error) {
       setMessageType("error");
-      setMessage(`failed delete flashcard id ${cardID}`);
+      setMessage(`failed delete flashcard`);
     } else if (result?.data) {
+      fetchFlashcards();
       setMessageType("");
-      setMessage(`success delete flashcard id ${cardID}`);
     }
   }
 
@@ -137,7 +138,7 @@ export default function Profile() {
               <p className="font-bold text-sm font-nunito">Study Session</p>
               <ActionButton text="Export" color="liver" onClick={handleExportStudySession} />
             </div>
-            <div className="text-sm font-nunito border rounded-md mt-3">
+            <div className="text-xs font-nunito border rounded-md mt-3">
               <table className="w-full">
                 <thead>
                   <tr>
@@ -215,7 +216,7 @@ export default function Profile() {
               <div className="bg-white px-4 py-3 pb-5 rounded-3xl">
                 <p className="text-center font-nunito text-sm">Create Your Card</p>
                 <div className="flex justify-center">
-                  <CardForm setIsOpen={setIsOpen}></CardForm>
+                  <CardForm setIsOpen={setIsOpen} fetchFlashcard={fetchFlashcards}></CardForm>
                 </div>
               </div>
             </div>

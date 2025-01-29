@@ -1,13 +1,15 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Field, Label, Radio, RadioGroup } from "@headlessui/react";
-import { FlashcardContext } from "../../context/flashcardContext";
 import Flashcard from "./Flashcard";
+import ActionButton from "../ui/ActionButton";
+import Toast from "../ui/Toast";
+import flashcardAPI from "../../api/flashcardAPI";
+import FormInput from "../ui/FormInput";
 
 const levelOption = ["beginner", "intermediate", "advance"];
 const partOfSpeechOption = ["noun", "verb", "adjective", "adverb", "preposition"];
 
-export default function CardForm({ setIsOpen }) {
-  const flashcardProvider = useContext(FlashcardContext);
+export default function CardForm({ setIsOpen, fetchFlashcard }) {
   const [term, setTerm] = useState("");
   const [definition, setDefinition] = useState("");
   const [level, setLevel] = useState("");
@@ -18,7 +20,7 @@ export default function CardForm({ setIsOpen }) {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const result = await flashcardProvider.create({
+    const result = await flashcardAPI.create({
       term,
       definition,
       level,
@@ -30,26 +32,21 @@ export default function CardForm({ setIsOpen }) {
       setMessage(result.error.message);
     } else {
       setIsOpen(false);
+      fetchFlashcard();
     }
   }
 
   return (
     <div>
+      <Toast message={message} onClose={() => setMessage("")} type="error" />
       <div className=" flex justify-center">
         <Flashcard category={category} level={level} partOfSpeech={partOfSpeech}></Flashcard>
       </div>
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-col gap-y-2 mt-3">
+        <div className="flex flex-col gap-y-2 mt-3 rounded-2xl border-b-[6px] bg-stone-100 p-5">
           <p className="font-nunito text-sm text-center">Fill this Form</p>
-          {message && <p className="text-sm text-center text-red-400 font-nunito">{message}</p>}
-          <input type="text" value={term} onChange={(e) => setTerm(e.target.value)} placeholder="term" className=" border text-center font-mono text-xs w-full py-1 rounded-lg outline-none" />
-          <input
-            type="text"
-            value={definition}
-            onChange={(e) => setDefinition(e.target.value)}
-            placeholder="definition"
-            className="border text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
-          />
+          <FormInput value={term} placeholder="term" onChange={setTerm} type="text" />
+          <FormInput value={definition} placeholder="definition" onChange={setDefinition} type="text" />
           <RadioGroup value={level} onChange={setLevel}>
             <div className="text-sm font-nunito flex justify-center gap-x-2">
               {levelOption.map((option) => (
@@ -62,13 +59,7 @@ export default function CardForm({ setIsOpen }) {
               ))}
             </div>
           </RadioGroup>
-          <input
-            type="text"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            placeholder="category"
-            className="border text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
-          />
+          <FormInput value={category} placeholder="category" onChange={setCategory} type="text" />
           <RadioGroup value={partOfSpeech} onChange={setPartOfSpeech}>
             <div className="text-sm font-nunito flex flex-wrap justify-center gap-x-1 gap-y-1">
               {partOfSpeechOption.map((option) => (
@@ -81,20 +72,10 @@ export default function CardForm({ setIsOpen }) {
               ))}
             </div>
           </RadioGroup>
-          <input
-            type="text"
-            value={exampleSentence}
-            onChange={(e) => setExampleSentence(e.target.value)}
-            placeholder="example"
-            className="border text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
-          />
+          <FormInput value={exampleSentence} placeholder="example sentence if user answer right" onChange={setExampleSentence} type="text" />
           <div className="w-full flex gap-4 justify-center">
-            <button className="font-nunito text-sm bg-rose-700 text-white px-2 py-0.5 rounded" onClick={() => setIsOpen(false)}>
-              Cancel
-            </button>
-            <button className="font-nunito text-sm bg-[#826933] text-white px-2 py-0.5 rounded" type="submit">
-              Save
-            </button>
+            <ActionButton onClick={() => setIsOpen(false)} text="Cancel" color="carmine" />
+            <ActionButton text="Create" color="hookers" type="submit" />
           </div>
         </div>
       </form>

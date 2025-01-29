@@ -13,6 +13,9 @@ User.propTypes = {
 };
 
 function Level({ level }) {
+  if (!level) {
+    return null;
+  }
   let customStyle = "";
   if (level === "beginner") {
     customStyle = "bg-[#469265]";
@@ -27,6 +30,9 @@ function Level({ level }) {
 }
 
 function Topic({ topic }) {
+  if (!topic) {
+    return null;
+  }
   return <span className="text-[10px] font-mono px-1 rounded flex items-center max-w-fit bg-[#c7a5c9] text-white">{topic}</span>;
 }
 
