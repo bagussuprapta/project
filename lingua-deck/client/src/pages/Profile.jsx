@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import Navbar from "../components/layout/Navbar";
 import { UserContext } from "../context/userContext";
@@ -12,6 +12,7 @@ import Toast from "../components/ui/Toast";
 import ActionButton from "../components/ui/ActionButton";
 import Trash from "../components/icon/Trash";
 import Pencil from "../components/icon/Pencil";
+import flashcardAPI from "../api/flashcardAPI";
 
 export default function Profile() {
   const userProvider = useContext(UserContext);
@@ -26,6 +27,36 @@ export default function Profile() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(6);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchFlashcards = useCallback(async () => {
+    const result = await flashcardAPI.getAllCreatedByUser(currentPage, pageSize);
+    if (result?.error) {
+      setMessage("failed to get flashcards");
+    } else if (result?.data) {
+      setUserFlashcards(result.data);
+      setTotalPages(result.meta.totalPages);
+      setMessage("success to get flashcard");
+    }
+  }, [currentPage, pageSize]);
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    fetchFlashcards();
+  }, [fetchFlashcards, currentPage, pageSize]);
 
   useEffect(() => {
     async function getUser() {
@@ -36,7 +67,6 @@ export default function Profile() {
         setUsername(result.data.username);
         setEmail(result.data.email);
         setPreferredLanguage(result.data.preferred_language);
-        setUserFlashcards(result.data.flashcards);
         setStudySessions(result.data.study_sessions);
       }
     }
@@ -161,6 +191,15 @@ export default function Profile() {
               </div>
             ))}
           </div>
+        </div>
+        <div className="mt-3 flex justify-center items-center gap-4">
+          <button onClick={handlePreviousPage} disabled={currentPage === 1} className={`px-2 text-sm font-nunito bg-gray-300 rounded ${currentPage === 1 ? "opacity-50" : ""}`}>
+            Back
+          </button>
+          <span className="text-sm font-nunito">{`Page ${currentPage} of ${totalPages}`}</span>
+          <button onClick={handleNextPage} disabled={currentPage === totalPages} className={`px-2 text-sm font-nunito bg-gray-300 rounded ${currentPage === totalPages ? "opacity-50" : ""}`}>
+            Next
+          </button>
         </div>
       </div>
       <div className="mt-14 px-3 flex flex-col gap-y-4 items-center">

@@ -23,6 +23,18 @@ async function importFlashcard(formData) {
   return response;
 }
 
+async function getAllCreatedByUser(page, pageSize) {
+  let response = await fetch(`${import.meta.env.VITE_API_URL}/api/users/flashcards?page=${page}&pageSize=${pageSize}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${localStorage.getItem("token")}`,
+    },
+  });
+  response = await response.json();
+  return response;
+}
+
 async function getAll(page, pageSize) {
   let response = await fetch(`${import.meta.env.VITE_API_URL}/api/flashcards?page=${page}&pageSize=${pageSize}`, {
     method: "GET",
@@ -46,4 +58,4 @@ async function deleteFlashcard(cardID) {
   return response;
 }
 
-export default { create, importFlashcard, getAll, deleteFlashcard };
+export default { create, importFlashcard, getAllCreatedByUser, getAll, deleteFlashcard };
