@@ -19,6 +19,8 @@ export default {
       "chestnut-normal": "inset 0 2px 0 0 #aa8475, inset 0 -2px 0 0 #513637",
       "hookers-light": "inset 0 2px 0 0 #c4d6cb, inset 0 -2px 0 0 #304c3f",
       "hookers-normal": "inset 0 2px 0 0 #9cb9a8, inset 0 -2px 0 0 #273e33",
+      "carmine-light": "inset 0 2px 0 0 #e98389, inset 0 -2px 0 0 #792236",
+      "carmine-normal": "inset 0 2px 0 0 #dc5763, inset 0 -2px 0 0 #430e18",
     },
   },
   plugins: [],

@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import Navbar from "../components/layout/Navbar";
-import { UserContext } from "../context/userContext";
 import CardForm from "../components/card/CardForm";
-import { FlashcardContext } from "../context/flashcardContext";
 import Flashcard from "../components/card/Flashcard";
 import studyAPI from "../api/studyAPI";
 import FormInput from "../components/ui/FormInput";
@@ -15,8 +13,6 @@ import Pencil from "../components/icon/Pencil";
 import flashcardAPI from "../api/flashcardAPI";
 
 export default function Profile() {
-  const userProvider = useContext(UserContext);
-  const flashcardProvider = useContext(FlashcardContext);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [preferredLanguage, setPreferredLanguage] = useState("");
@@ -30,6 +26,7 @@ export default function Profile() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
+  const [resetKey, setResetKey] = useState(0);
 
   const fetchFlashcards = useCallback(async () => {
     const result = await flashcardAPI.getAllCreatedByUser(currentPage, pageSize);
@@ -38,6 +35,7 @@ export default function Profile() {
     } else if (result?.data) {
       setUserFlashcards(result.data);
       setTotalPages(result.meta.totalPages);
+      setMessageType("");
       setMessage("success to get flashcard");
     }
   }, [currentPage, pageSize]);
@@ -45,33 +43,28 @@ export default function Profile() {
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
+      setResetKey((prev) => prev + 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage((prev) => prev + 1);
+      setResetKey((prev) => prev + 1);
     }
   };
 
-  useEffect(() => {
-    fetchFlashcards();
-  }, [fetchFlashcards, currentPage, pageSize]);
-
-  useEffect(() => {
-    async function getUser() {
-      const result = await userProvider.get();
-      if (result?.error) {
-        setMessage("failed get your data");
-      } else if (result?.data) {
-        setUsername(result.data.username);
-        setEmail(result.data.email);
-        setPreferredLanguage(result.data.preferred_language);
-        setStudySessions(result.data.study_sessions);
-      }
+  const fetchUserDetail = useCallback(async () => {
+    const result = await userAPI.get();
+    if (result?.error) {
+      setMessage("failed get your data");
+    } else if (result?.data) {
+      setUsername(result.data.username);
+      setEmail(result.data.email);
+      setPreferredLanguage(result.data.preferred_language);
+      setStudySessions(result.data.study_sessions);
     }
-    getUser();
-  }, [message, userProvider]);
+  }, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -84,12 +77,19 @@ export default function Profile() {
     }
     const formData = new FormData();
     formData.append("file", file);
-    await flashcardProvider.importFlashcards(formData);
+    await flashcardAPI.importFlashcard(formData);
     setIsImport(false);
   }
 
   async function handleDelete(cardID) {
-    await flashcardProvider.deleteFlashcard(cardID);
+    const result = await flashcardAPI.deleteFlashcard(cardID);
+    if (result?.error) {
+      setMessageType("error");
+      setMessage(`failed delete flashcard id ${cardID}`);
+    } else if (result?.data) {
+      setMessageType("");
+      setMessage(`success delete flashcard id ${cardID}`);
+    }
   }
 
   async function handleExportStudySession() {
@@ -107,6 +107,11 @@ export default function Profile() {
       setMessage("success update");
     }
   }
+
+  useEffect(() => {
+    fetchFlashcards();
+    fetchUserDetail();
+  }, [fetchFlashcards, fetchUserDetail, currentPage, pageSize]);
 
   return (
     <div>
@@ -179,7 +184,7 @@ export default function Profile() {
           <div className="mt-3 flex flex-wrap justify-center gap-x-1 gap-y-1">
             {userFlashcards.map((flashcard, index) => (
               <div key={index} className="flex flex-col">
-                <Flashcard level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
+                <Flashcard reset={resetKey} level={flashcard.level} category={flashcard.category} partOfSpeech={flashcard.part_of_speech} definition={flashcard.definition} username={username} />
                 <div className="flex justify-center items-center gap-x-7 mt-2">
                   <Trash
                     onClick={() => {
@@ -202,57 +207,50 @@ export default function Profile() {
           </button>
         </div>
       </div>
-      <div className="mt-14 px-3 flex flex-col gap-y-4 items-center">
-        <div>
-          <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-            <DialogPanel>
-              <div className="fixed inset-0 items-center justify-center bg-stone-400 bg-opacity-60 flex">
-                <div className="w-80 flex flex-col gap-y-3">
-                  <div className="bg-white px-4 w-full py-3 pb-5 rounded-3xl border">
-                    <div className=" w-full">
-                      <p className="text-center font-nunito text-sm">Create Your Card</p>
-                    </div>
-                    <div className="flex justify-center">
-                      <CardForm setIsOpen={setIsOpen}></CardForm>
-                    </div>
-                  </div>
+      {/** Dialog to create flashcard */}
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+        <DialogPanel>
+          <div className="fixed inset-0 flex items-center justify-center bg-stone-400 bg-opacity-60">
+            <div>
+              <div className="bg-white px-4 py-3 pb-5 rounded-3xl">
+                <p className="text-center font-nunito text-sm">Create Your Card</p>
+                <div className="flex justify-center">
+                  <CardForm setIsOpen={setIsOpen}></CardForm>
                 </div>
               </div>
-            </DialogPanel>
-          </Dialog>
-          <Dialog open={isImport} onClose={() => setIsImport(false)} className="relative z-50">
-            <DialogPanel>
-              <div className="fixed inset-0 items-center justify-center bg-stone-400 bg-opacity-60 flex">
-                <div className="w-80 flex flex-col gap-y-3">
-                  <div className="bg-white px-4 w-full py-3 pb-3 rounded-3xl border">
-                    <div className=" w-full">
+            </div>
+          </div>
+        </DialogPanel>
+      </Dialog>
+      {/** Dialog to import flashcard */}
+      <Dialog open={isImport} onClose={() => setIsImport(false)} className="relative z-50">
+        <DialogPanel>
+          <div className="fixed inset-0 flex items-center justify-center bg-stone-400 bg-opacity-60">
+            <div>
+              <div className="bg-white px-4 w-full py-3 pb-3 rounded-3xl">
+                <div className="flex justify-center">
+                  <form onSubmit={handleImport}>
+                    <div className="flex flex-col gap-y-3">
                       <p className="text-center font-nunito text-sm">Import Your Card</p>
-                    </div>
-                    <div className="flex justify-center">
-                      <div>
-                        <form onSubmit={handleImport}>
-                          <input type="file" onChange={handleFileChange} />
-                          <div className="w-full flex gap-4 justify-center">
-                            <button
-                              onClick={() => {
-                                setIsImport(false);
-                              }}
-                              className="font-nunito text-sm bg-rose-700 text-white px-2 py-0.5 rounded"
-                            >
-                              Cancel
-                            </button>
-                            <button className="font-nunito text-sm bg-[#826933] text-white px-2 py-0.5 rounded">Import</button>
-                          </div>
-                        </form>
+                      <input className="text-sm font-nunito" type="file" onChange={handleFileChange} />
+                      <div className="w-full flex gap-4 justify-center">
+                        <ActionButton
+                          text="Cancel"
+                          color="carmine"
+                          onClick={() => {
+                            setIsImport(false);
+                          }}
+                        />
+                        <ActionButton text="Import" color="liver" type="submit" />
                       </div>
                     </div>
-                  </div>
+                  </form>
                 </div>
               </div>
-            </DialogPanel>
-          </Dialog>
-        </div>
-      </div>
+            </div>
+          </div>
+        </DialogPanel>
+      </Dialog>
     </div>
   );
 }
