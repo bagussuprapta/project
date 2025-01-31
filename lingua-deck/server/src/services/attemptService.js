@@ -30,7 +30,8 @@ const attemptFlashcard = async (user, params, body) => {
     throw new ResponseError(409, "you have already attempted this flashcard.");
   }
 
-  const termAnswer = queriedFlashcard.term.split(", ").map((word) => word.trim());
+  const termAnswer = queriedFlashcard.term.split(",").map((word) => word.trim());
+
   const isCorrect = termAnswer.includes(validatedAttemptTerm.term);
 
   if (isCorrect) {
@@ -78,9 +79,9 @@ const attemptFlashcard = async (user, params, body) => {
     createdStudySession = await prismaClient.studySession.create({
       data: {
         user_id: user.user_id,
-        total_cards: 0,
-        total_correct: 0,
-        total_incorrect: 0,
+        total_cards: 1,
+        total_correct: isCorrect ? 1 : 0,
+        total_incorrect: isCorrect ? 0 : 1,
       },
       select: {
         total_cards: true,

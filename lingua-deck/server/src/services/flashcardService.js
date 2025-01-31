@@ -8,6 +8,7 @@ import stripBom from "strip-bom";
 
 const create = async (user, request) => {
   request.user_id = user.user_id;
+  request.term = request.term.replace(/\s+/g, "");
   const validatedFlashcard = validator(createFlashcardValidation, request);
   return await prismaClient.flashcard.create({
     data: validatedFlashcard,
