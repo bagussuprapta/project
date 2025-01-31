@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import Navbar from "../components/layout/Navbar";
 import CardForm from "../components/card/CardForm";
 import Flashcard from "../components/card/Flashcard";
@@ -114,6 +116,23 @@ export default function Profile() {
     }
   }
 
+  function handleExportPDF() {
+    const doc = jsPDF();
+
+    doc.text("Study Session", 14, 16);
+    const column = ["Date", "Total Card", "Total Correct", "Total Incorrect"];
+    const rows = studySessions.map((item) => [item.session_date, item.total_cards, item.total_correct, item.total_incorrect]);
+
+    doc.autoTable({
+      head: [column],
+      body: rows,
+      startY: 20,
+      theme: "striped",
+    });
+
+    doc.save("study-session.pdf");
+  }
+
   useEffect(() => {
     fetchFlashcards();
     fetchUserDetail();
@@ -141,7 +160,8 @@ export default function Profile() {
           <div className="w-full border px-6 py-3 rounded-2xl border-b-[6px] bg-stone-100">
             <div className="flex items-center justify-center gap-x-3">
               <p className="font-bold text-sm font-nunito">Study Session</p>
-              <ActionButton text="Export" color="liver" onClick={handleExportStudySession} />
+              <ActionButton text="Export CSV" color="liver" onClick={handleExportStudySession} />
+              <ActionButton text="Export PDF" color="liver" onClick={handleExportPDF} />
             </div>
             <div className="text-xs font-nunito border rounded-md mt-3">
               <table className="w-full">
