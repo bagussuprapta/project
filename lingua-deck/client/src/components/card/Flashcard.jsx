@@ -2,6 +2,8 @@ import { Badge } from "../ui/Badge";
 import Logo from "../icon/Logo";
 import { useContext, useEffect, useState } from "react";
 import { AttemptContext } from "../../context/attemptContext";
+import ActionButton from "../ui/ActionButton";
+import FormInput from "../ui/FormInput";
 
 function BackCard({ handleFlip, level, category, partOfSpeech, username }) {
   return (
@@ -64,32 +66,12 @@ function FrontCard({ handleFlip, definition, cardID }) {
         </div>
       </div>
       <div>
-        <p className="font-nunito text-xs text-center text-red-600">{message}</p>
-        <input
-          type="text"
-          value={term}
-          onChange={(e) => {
-            setTerm(e.target.value);
-          }}
-          placeholder="term"
-          className="text-center font-mono text-xs w-full py-1 rounded-lg outline-none"
-        />
+        {message && <p className="font-nunito text-xs text-center">{message}</p>}
+        <FormInput value={term} placeholder="term" onChange={setTerm} type="text" />
       </div>
-      <div className="flex gap-x-2">
-        <button
-          onClick={handleFlip}
-          className="w-full mt-3 py-1 text-xs rounded-lg bg-red-600 hover:bg-rose-700 shadow-rose-light hover:shadow-rose-normal border border-red-700 font-nunito font-bold text-white"
-        >
-          GIVE UP
-        </button>
-        <button
-          onClick={() => {
-            handleAttempt();
-          }}
-          className="w-full mt-3 py-1 text-xs rounded-lg bg-lime-400 hover:bg-lime-500 shadow-lime-light hover:shadow-lime-normal border border-lime-600 font-nunito font-bold text-white"
-        >
-          SUBMIT
-        </button>
+      <div className="flex gap-x-2 items-center justify-center">
+        <ActionButton onClick={handleFlip} text="Give Up" color="carmine" />
+        <ActionButton onClick={handleAttempt} text="Try" color="liver" />
       </div>
     </div>
   );

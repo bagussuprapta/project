@@ -23,6 +23,7 @@ export default function Profile() {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
+  const [messageImport, setMessageImport] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
@@ -77,9 +78,13 @@ export default function Profile() {
     }
     const formData = new FormData();
     formData.append("file", file);
-    await flashcardAPI.importFlashcard(formData);
-    setIsImport(false);
-    fetchFlashcards();
+    const result = await flashcardAPI.importFlashcard(formData);
+    if (result?.error) {
+      setMessageImport(result.error.message);
+    } else if (result?.data) {
+      setIsImport(false);
+      fetchFlashcards();
+    }
   }
 
   async function handleDelete(cardID) {
@@ -234,6 +239,7 @@ export default function Profile() {
                     <div className="flex flex-col gap-y-3">
                       <p className="text-center font-nunito text-sm">Import Your Card</p>
                       <input className="text-sm font-nunito" type="file" onChange={handleFileChange} />
+                      {messageImport && <p className="font-nunito text-sm text-red-500 text-center">{messageImport}</p>}
                       <div className="w-full flex gap-4 justify-center">
                         <ActionButton
                           text="Cancel"
