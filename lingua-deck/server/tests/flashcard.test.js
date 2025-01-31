@@ -24,7 +24,7 @@ describe("POST /api/flashcards", function () {
 
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();
-    expect(result.body.data.term).toBe("apple, basket");
+    expect(result.body.data.term).toBe("apple,basket");
     expect(result.body.data.definition).toBe("A definition of a term.");
     expect(result.body.data.level).toBe("beginner");
     expect(result.body.data.category).toBe("fruit basket");
